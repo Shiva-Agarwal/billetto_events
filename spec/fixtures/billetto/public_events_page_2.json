@@ -1,0 +1,19 @@
+{
+  "object": "list",
+  "data": [
+    {
+      "id": 1003,
+      "title": "Aarhus Stand-up Comedy",
+      "description": "Laugh out loud.",
+      "startdate": "2030-07-15T19:30:00Z",
+      "enddate": null,
+      "url": "https://billetto.dk/e/aarhus-standup-1003",
+      "image_link": null,
+      "location": { "location_name": "Train", "city": "Aarhus", "country_code": "DK" },
+      "organiser": { "id": 43, "name": "Comedy Zoo" },
+      "minimum_price": { "amount_in_cents": 0, "currency": "DKK" }
+    }
+  ],
+  "has_more": false,
+  "next_url": null
+}

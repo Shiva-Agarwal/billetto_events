@@ -1,0 +1,7 @@
+:concurrency: <%= ENV.fetch("SIDEKIQ_CONCURRENCY", 10) %>
+# Weighted queues: critical work (webhooks) is picked first, bulk ingestion last.
+:queues:
+  - [critical, 6]
+  - [default, 4]
+  - [read_models, 4]
+  - [low, 1]

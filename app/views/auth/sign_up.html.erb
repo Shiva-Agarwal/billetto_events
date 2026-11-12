@@ -1,0 +1,6 @@
+<% content_for :title, "Sign up · Billetto Events" %>
+<section class="auth">
+  <h1>Create your account</h1>
+  <div data-clerk-component="sign-up" data-redirect-url="<%= after_auth_url %>" data-testid="clerk-sign-up"></div>
+  <p class="muted">Already registered? <%= link_to "Sign in", sign_in_path(redirect_url: params[:redirect_url]) %></p>
+</section>

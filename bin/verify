@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# One-shot verification: environment check, install, database, RSpec (incl. browser tests)
+# and Playwright E2E. Everything is logged to log/verify.log.
+#   bin/verify            # full run
+#   SKIP_E2E=1 bin/verify # skip Playwright
+cd "$(dirname "$0")/.." || exit 1
+mkdir -p log tmp
+LOG=log/verify.log
+: > "$LOG"
+export RAILS_ENV_ORIG="${RAILS_ENV:-}"
+status=0
+
+step() {
+  local name="$1"; shift
+  echo "===== [$(date +%H:%M:%S)] $name: $*" | tee -a "$LOG"
+  "$@" >> "$LOG" 2>&1
+  local code=$?
+  echo "===== $name exit=$code" | tee -a "$LOG"
+  [ $code -ne 0 ] && status=1
+  return $code
+}
+
+step env bash -c 'uname -a; echo "ruby: $(ruby -v)"; echo "bundler: $(bundle -v)"; which psql pg_isready redis-server node npm google-chrome chromium 2>&1; ls "/Applications/Google Chrome.app" 2>&1 | head -1; pg_isready 2>&1; psql -V 2>&1; node -v 2>&1'
+step bundle bundle install --jobs 4 || { echo "bundle install failed - see $LOG" ; exit 1; }
+step db_dev bin/rails db:prepare
+step db_test env RAILS_ENV=test bin/rails db:prepare
+step zeitwerk bin/rails zeitwerk:check
+step seed bin/rails db:seed
+step rspec env COVERAGE=1 bin/rspec --format progress --format documentation --out tmp/rspec_doc.txt
+step rubocop bundle exec rubocop
+if [ -z "$SKIP_E2E" ]; then
+  step npm_install bash -c 'cd e2e && npm install --no-audit --no-fund'
+  step playwright_browsers bash -c 'cd e2e && npx playwright install chromium'
+  step playwright bash -c 'cd e2e && npx playwright test --reporter=list'
+fi
+
+echo "===== DONE overall_status=$status (details in $LOG)" | tee -a "$LOG"
+exit $status

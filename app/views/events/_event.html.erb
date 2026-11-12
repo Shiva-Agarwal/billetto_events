@@ -1,0 +1,31 @@
+<% event = item.event %>
+<li class="event-card" id="<%= event.tid %>" data-testid="event-<%= event.external_id %>">
+  <div class="event-card__media">
+    <% if event.image_url.present? %>
+      <%= image_tag event.image_url, alt: "", loading: "lazy", decoding: "async" %>
+    <% else %>
+      <div class="event-card__placeholder" aria-hidden="true"><%= event.title.first.upcase %></div>
+    <% end %>
+    <time class="event-card__date" datetime="<%= event.starts_at.iso8601 %>"><%= event_date(event) %></time>
+  </div>
+
+  <div class="event-card__body">
+    <h2 class="event-card__title" data-testid="event-title"><%= event.title %></h2>
+    <% if (location = event_location(event)) %>
+      <p class="event-card__meta"><%= location %></p>
+    <% end %>
+    <% if event.description.present? %>
+      <p class="event-card__description"><%= truncate(event.description, length: 180, separator: " ") %></p>
+    <% end %>
+    <p class="event-card__meta">
+      <% if (price = event_price(event)) %><span class="pill"><%= price %></span><% end %>
+      <% if event.url.present? %><%= link_to "Tickets on Billetto ↗", event.url, target: "_blank", rel: "noopener" %><% end %>
+    </p>
+  </div>
+
+  <div class="event-card__votes" data-testid="votes">
+    <%= vote_button(item, "up") %>
+    <%= vote_button(item, "down") %>
+    <span class="score" title="Likes minus dislikes" data-testid="score"><%= item.score.positive? ? "+#{item.score}" : item.score %></span>
+  </div>
+</li>

@@ -1,0 +1,67 @@
+<%# Clerk's browser SDK (Core 3): the UI bundle, then clerk-js - real ones from the Clerk Frontend API,
+    or the local fake. `defer` keeps them in order and runs them before the window load event. %>
+<% if clerk.ui_script_url %>
+  <script defer crossorigin="anonymous" src="<%= clerk.ui_script_url %>" type="text/javascript"></script>
+<% end %>
+<script
+  defer
+  crossorigin="anonymous"
+  data-clerk-publishable-key="<%= clerk.publishable_key %>"
+  src="<%= clerk.frontend_script_url %>"
+  type="text/javascript"></script>
+<script>
+  window.addEventListener("load", async function () {
+    if (!window.Clerk) { console.error("[clerk] clerk-js failed to load"); return; }
+    const loadOptions = { signInUrl: "/sign_in", signUpUrl: "/sign_up" };
+    if (window.__internal_ClerkUICtor) loadOptions.ui = { ClerkUI: window.__internal_ClerkUICtor };
+    await window.Clerk.load(loadOptions);
+
+    const redirectTarget = (el) => el.dataset.redirectUrl || "/";
+
+    document.querySelectorAll("[data-clerk-component]").forEach(function (el) {
+      const options = {
+        signInUrl: "/sign_in",
+        signUpUrl: "/sign_up",
+        forceRedirectUrl: redirectTarget(el),
+        fallbackRedirectUrl: "/"
+      };
+      switch (el.dataset.clerkComponent) {
+        case "sign-in": window.Clerk.mountSignIn(el, options); break;
+        case "sign-up": window.Clerk.mountSignUp(el, options); break;
+        case "user-button": window.Clerk.mountUserButton(el, { afterSignOutUrl: "/" }); break;
+      }
+    });
+
+    document.querySelectorAll("[data-clerk-sign-out]").forEach(function (button) {
+      button.addEventListener("click", async function (event) {
+        event.preventDefault();
+        await window.Clerk.signOut({ redirectUrl: "/" });
+      });
+    });
+
+    // The server renders based on the `__session` cookie. If clerk-js has a session the server
+    // did not see (e.g. right after sign-in in another tab), refresh the cookie and reload once.
+    const serverSignedIn = document.body.dataset.signedIn === "true";
+    if (window.Clerk.user && !serverSignedIn && !sessionStorage.getItem("clerk-synced")) {
+      sessionStorage.setItem("clerk-synced", "1");
+      await window.Clerk.session.getToken();
+      window.location.reload();
+    } else {
+      sessionStorage.removeItem("clerk-synced");
+    }
+
+    // Clerk session tokens live ~60s; clerk-js refreshes the __session cookie in the background
+    // while the page is open. When a tab comes back from being idle/hidden, refresh it right
+    // away (fire-and-forget) so the next request carries a valid token. Form submission is
+    // never intercepted.
+    const refreshSessionCookie = function () {
+      if (window.Clerk.session) { window.Clerk.session.getToken().catch(function () {}); }
+    };
+    window.addEventListener("focus", refreshSessionCookie);
+    document.addEventListener("visibilitychange", function () {
+      if (document.visibilityState === "visible") refreshSessionCookie();
+    });
+
+    document.documentElement.dataset.clerkLoaded = "true";
+  });
+</script>

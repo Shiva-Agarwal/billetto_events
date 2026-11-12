@@ -1,0 +1,16 @@
+{
+  "name": "billetto-events-e2e",
+  "private": true,
+  "description": "Playwright end-to-end tests running against a live Rails server",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:real-clerk": "E2E_REAL_CLERK=1 playwright test",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@clerk/testing": "^1.4.0",
+    "@playwright/test": "^1.48.0",
+    "dotenv": "^16.4.5"
+  }
+}

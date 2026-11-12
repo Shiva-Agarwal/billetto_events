@@ -1,0 +1,35 @@
+{
+  "object": "list",
+  "data": [
+    {
+      "id": 1001,
+      "title": "Copenhagen Jazz Night",
+      "description": "<p>Live jazz &amp; cocktails.</p><p>Doors at 19:00.</p>",
+      "startdate": "2030-06-01T18:00:00Z",
+      "enddate": "2030-06-01T22:00:00Z",
+      "url": "https://billetto.dk/e/copenhagen-jazz-night-1001",
+      "image_link": "https://cdn.billetto.dk/images/1001.jpg",
+      "kind": "single",
+      "location": {
+        "location_name": "Jazzhouse",
+        "address": "Niels Hemmingsens Gade 10",
+        "city": "Copenhagen",
+        "zip_code": "1153",
+        "country_code": "dk",
+        "coordinates": { "latitude": 55.68, "longitude": 12.57 }
+      },
+      "organiser": { "id": 42, "name": "Jazzhouse ApS" },
+      "minimum_price": { "amount_in_cents": 15000, "currency": "dkk" },
+      "availability": "available"
+    },
+    {
+      "id": 1002,
+      "title": "Recurring Yoga Class",
+      "description": "Every Monday",
+      "kind": "regular",
+      "url": "https://billetto.dk/e/recurring-yoga-1002"
+    }
+  ],
+  "has_more": true,
+  "next_url": "https://billetto.test/api/v3/public/events?after=1002&limit=2"
+}

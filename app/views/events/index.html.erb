@@ -1,0 +1,23 @@
+<% content_for :title, "Upcoming events · Billetto Events" %>
+
+<section class="hero">
+  <h1>Upcoming events</h1>
+  <p>Fresh from Billetto. Sign in to like or dislike - votes are recorded as facts in Rails Event Store.</p>
+</section>
+
+<% if @page.items.empty? %>
+  <div class="empty" data-testid="no-events">
+    <p>No upcoming events yet.</p>
+    <p class="muted">Import them with <code>bin/rails billetto:sync</code>.</p>
+  </div>
+<% else %>
+  <ol class="event-grid" data-testid="event-list">
+    <%= render partial: "events/event", collection: @page.items, as: :item %>
+  </ol>
+
+  <% if @page.next_cursor %>
+    <nav class="pager">
+      <%= link_to "Later events →", events_path(after: @page.next_cursor), class: "btn btn--ghost", data: { testid: "next-page" } %>
+    </nav>
+  <% end %>
+<% end %>

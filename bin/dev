@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+# Starts web + Sidekiq when ACTIVE_JOB_ADAPTER=sidekiq, otherwise just the web server
+# (development defaults to the in-process :async ActiveJob adapter, no Redis required).
+if [ "${ACTIVE_JOB_ADAPTER}" = "sidekiq" ]; then
+  exec bundle exec foreman start -f Procfile.dev "$@" 2>/dev/null || {
+    echo "foreman not installed - run 'gem install foreman' or start 'bin/rails s' and 'bundle exec sidekiq' separately"; exit 1; }
+fi
+exec bin/rails server "$@"

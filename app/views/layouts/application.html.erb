@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title><%= content_for(:title) || "Billetto Events" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag "application" %>
+    <%= render "layouts/clerk" %>
+  </head>
+
+  <body data-signed-in="<%= signed_in? %>">
+    <header class="topbar">
+      <div class="container topbar__inner">
+        <%= link_to root_path, class: "brand" do %>billetto<span>events</span><% end %>
+        <nav class="topbar__nav" aria-label="Account">
+          <% if signed_in? %>
+            <span class="topbar__user" data-testid="current-user"><%= current_user_label %></span>
+            <% unless clerk.fake? %><div data-clerk-component="user-button"></div><% end %>
+            <button type="button" class="btn btn--ghost" data-clerk-sign-out data-testid="sign-out">Sign out</button>
+          <% else %>
+            <%= link_to "Sign in", sign_in_path, class: "btn btn--ghost", data: { testid: "sign-in-link" } %>
+            <%= link_to "Sign up", sign_up_path, class: "btn", data: { testid: "sign-up-link" } %>
+          <% end %>
+        </nav>
+      </div>
+    </header>
+
+    <% unless Rails.env.test? %>
+      <% fakes = { "Billetto" => Rails.configuration.x.fake_billetto, "Clerk" => Rails.configuration.x.fake_clerk }.select { |_, fake| fake }.keys %>
+      <% if fakes.any? %>
+        <div class="banner">Running with <strong>fake</strong> <%= fakes.to_sentence %> integration<%= "s" if fakes.size > 1 %> (no credentials configured).</div>
+      <% end %>
+    <% end %>
+
+    <main class="container">
+      <% flash.each do |type, message| %>
+        <div class="<%= flash_class(type) %>" role="status" data-testid="flash"><%= message %></div>
+      <% end %>
+      <%= yield %>
+    </main>
+  </body>
+</html>
