@@ -33,7 +33,7 @@ export default defineConfig({
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: {
-    command: `cd .. && ${serverEnv} bin/rails db:prepare && ${serverEnv} bin/rails db:seed && ${serverEnv} bin/rails server -p ${PORT}`,
+    command: `cd .. && ${serverEnv} bin/rails db:prepare && ${serverEnv} bin/rails db:seed && ${serverEnv} bin/rails server -p ${PORT} -P tmp/pids/e2e_server.pid`,
     url: `http://localhost:${PORT}/up`,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

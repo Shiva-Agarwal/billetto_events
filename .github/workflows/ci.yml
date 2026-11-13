@@ -28,7 +28,6 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
-      - uses: browser-actions/setup-chrome@v1
       - name: Prepare database
         run: bin/rails db:create db:schema:load 2>/dev/null || bin/rails db:create db:migrate
       - name: RSpec (unit, request and browser tests)
